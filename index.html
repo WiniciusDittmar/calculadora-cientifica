@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Calculadora Científica</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #0a0a15;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      font-family: 'Courier New', monospace;
+    }
+
+    .calc {
+      background: #12121f;
+      border-radius: 24px;
+      padding: 24px;
+      width: 320px;
+      border: 1px solid #2a2a45;
+    }
+
+    .display {
+      background: #0a0a15;
+      border-radius: 14px;
+      padding: 18px 20px;
+      margin-bottom: 18px;
+      min-height: 96px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: flex-end;
+      gap: 6px;
+      overflow: hidden;
+    }
+
+    .expr {
+      font-size: 12px;
+      color: #4a4a77;
+      min-height: 16px;
+      word-break: break-all;
+      text-align: right;
+      width: 100%;
+    }
+
+    .result {
+      font-size: 30px;
+      color: #ddddf8;
+      font-weight: 500;
+      word-break: break-all;
+      text-align: right;
+      width: 100%;
+    }
+
+    .mode-row {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+
+    .mode-btn {
+      flex: 1;
+      padding: 7px;
+      background: #1e1e35;
+      border: 1px solid #2a2a45;
+      border-radius: 8px;
+      color: #6666aa;
+      font-size: 12px;
+      cursor: pointer;
+      font-family: 'Courier New', monospace;
+      transition: all 0.15s;
+    }
+
+    .mode-btn.active {
+      background: #3a3a88;
+      border-color: #5555bb;
+      color: #ddddf8;
+    }
+
+    .sci-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+
+    .main-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+    }
+
+    .btn {
+      height: 48px;
+      border: none;
+      border-radius: 10px;
+      font-size: 13px;
+      cursor: pointer;
+      font-weight: 500;
+      font-family: 'Courier New', monospace;
+      transition: transform 0.1s, filter 0.1s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+    }
+
+    .btn:active { transform: scale(0.93); filter: brightness(1.2); }
+
+    .n { background: #1e1e35; color: #ccccf0; }
+    .o { background: #252548; color: #7777ee; }
+    .s { background: #181830; color: #6060bb; font-size: 11px; }
+    .e { background: #4444bb; color: #fff; }
+    .c { background: #2d1a1a; color: #ff7777; }
+    .span2 { grid-column: span 2; }
+
+    .sep {
+      height: 1px;
+      background: #1e1e35;
+      margin: 8px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="calc">
+    <div class="display">
+      <div class="expr" id="expr"></div>
+      <div class="result" id="result">0</div>
+    </div>
+
+    <div class="mode-row">
+      <button class="mode-btn active" id="mode-deg" onclick="setMode('deg')">DEG</button>
+      <button class="mode-btn" id="mode-rad" onclick="setMode('rad')">RAD</button>
+    </div>
+
+    <div class="sci-grid">
+      <button class="btn s" onclick="sci('sin')">sin</button>
+      <button class="btn s" onclick="sci('cos')">cos</button>
+      <button class="btn s" onclick="sci('tan')">tan</button>
+      <button class="btn s" onclick="sci('log')">log</button>
+      <button class="btn s" onclick="sci('ln')">ln</button>
+      <button class="btn s" onclick="sci('asin')">sin⁻¹</button>
+      <button class="btn s" onclick="sci('acos')">cos⁻¹</button>
+      <button class="btn s" onclick="sci('atan')">tan⁻¹</button>
+      <button class="btn s" onclick="sci('sqrt')">√x</button>
+      <button class="btn s" onclick="sci('sq')">x²</button>
+      <button class="btn s" onclick="insertConst('PI')">π</button>
+      <button class="btn s" onclick="insertConst('E')">e</button>
+      <button class="btn s" onclick="sci('abs')">|x|</button>
+      <button class="btn s" onclick="app('^')">xʸ</button>
+      <button class="btn s" onclick="sci('fact')">n!</button>
+    </div>
+
+    <div class="sep"></div>
+
+    <div class="main-grid">
+      <button class="btn c" onclick="clearAll()">AC</button>
+      <button class="btn o" onclick="del()">⌫</button>
+      <button class="btn o" onclick="app('%')">%</button>
+      <button class="btn o" onclick="app('/')">÷</button>
+      <button class="btn n" onclick="app('7')">7</button>
+      <button class="btn n" onclick="app('8')">8</button>
+      <button class="btn n" onclick="app('9')">9</button>
+      <button class="btn o" onclick="app('*')">×</button>
+      <button class="btn n" onclick="app('4')">4</button>
+      <button class="btn n" onclick="app('5')">5</button>
+      <button class="btn n" onclick="app('6')">6</button>
+      <button class="btn o" onclick="app('-')">−</button>
+      <button class="btn n" onclick="app('1')">1</button>
+      <button class="btn n" onclick="app('2')">2</button>
+      <button class="btn n" onclick="app('3')">3</button>
+      <button class="btn o" onclick="app('+')">+</button>
+      <button class="btn n span2" onclick="app('0')">0</button>
+      <button class="btn n" onclick="app('.')">.</button>
+      <button class="btn e" onclick="calc()">=</button>
+    </div>
+  </div>
+
+  <script>
+    let ex = '', mode = 'deg';
+    const eEl = document.getElementById('expr');
+    const rEl = document.getElementById('result');
+
+    function setMode(m) {
+      mode = m;
+      document.getElementById('mode-deg').classList.toggle('active', m === 'deg');
+      document.getElementById('mode-rad').classList.toggle('active', m === 'rad');
+    }
+
+    function app(s) {
+      if (ex === 'Error') ex = '';
+      ex += s;
+      eEl.textContent = ex.replace(/\*/g, '×').replace(/\//g, '÷');
+      preview();
+    }
+
+    function insertConst(c) {
+      if (ex === 'Error') ex = '';
+      ex += c === 'PI' ? Math.PI : Math.E;
+      eEl.textContent = ex.replace(/\*/g, '×').replace(/\//g, '÷');
+      preview();
+    }
+
+    function sci(fn) {
+      if (ex === 'Error') ex = '';
+      const map = {
+        sin: 'Math.sin(', cos: 'Math.cos(', tan: 'Math.tan(',
+        asin: 'Math.asin(', acos: 'Math.acos(', atan: 'Math.atan(',
+        log: 'Math.log10(', ln: 'Math.log(', sqrt: 'Math.sqrt(', abs: 'Math.abs('
+      };
+      if (fn === 'sq') { ex += '^2'; }
+      else if (fn === 'fact') {
+        let n = parseFloat(ex);
+        if (!isNaN(n) && n >= 0 && Number.isInteger(n) && n <= 170) {
+          let f = 1;
+          for (let i = 2; i <= n; i++) f *= i;
+          ex = f.toString();
+        }
+      } else if (map[fn]) {
+        ex = map[fn] + ex + ')';
+      }
+      eEl.textContent = ex.replace(/\*/g, '×').replace(/\//g, '÷');
+      preview();
+    }
+
+    function clearAll() { ex = ''; eEl.textContent = ''; rEl.textContent = '0'; }
+
+    function del() {
+      if (ex === 'Error') { clearAll(); return; }
+      ex = ex.slice(0, -1);
+      eEl.textContent = ex.replace(/\*/g, '×').replace(/\//g, '÷');
+      preview();
+    }
+
+    function prepExpr(e) {
+      const r = mode === 'deg' ? Math.PI / 180 : 1;
+      e = e.replace(/Math\.sin\(([^)]+)\)/g, (_, a) => `Math.sin(${r}*(${a}))`);
+      e = e.replace(/Math\.cos\(([^)]+)\)/g, (_, a) => `Math.cos(${r}*(${a}))`);
+      e = e.replace(/Math\.tan\(([^)]+)\)/g, (_, a) => `Math.tan(${r}*(${a}))`);
+      e = e.replace(/\^/g, '**').replace(/%/g, '/100');
+      return e;
+    }
+
+    function preview() {
+      try {
+        let v = Function('"use strict"; return (' + prepExpr(ex) + ')')();
+        if (isFinite(v)) rEl.textContent = +parseFloat(v.toFixed(10)) + '';
+      } catch (e) {}
+    }
+
+    function calc() {
+      if (!ex) return;
+      try {
+        let v = Function('"use strict"; return (' + prepExpr(ex) + ')')();
+        let r = +parseFloat(v.toFixed(10)) + '';
+        eEl.textContent = ex.replace(/\*/g, '×').replace(/\//g, '÷');
+        rEl.textContent = r;
+        ex = r;
+      } catch (e) {
+        rEl.textContent = 'Error';
+        ex = 'Error';
+      }
+    }
+  </script>
+</body>
+</html>
